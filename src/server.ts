@@ -1,6 +1,7 @@
 // server.ts
 import { context, trace } from '@opentelemetry/api';
 import './tracing'; // ต้องมาก่อนการ import อื่น ๆ
+
 import Fastify from 'fastify';
 
 const app = Fastify();

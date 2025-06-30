@@ -1,10 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
+    "target": "ES2020",                        // ✅ รองรับ async/await, Promise ฯลฯ
+    "module": "CommonJS",                      // ✅ ใช้กับ Node.js (หรือ "ESNext" ก็ได้ ถ้าใช้ "type": "module")
+    "lib": ["ES2020"],
+    "esModuleInterop": true,                   // ✅ สำหรับ default import (เช่น import axios from 'axios')
+    "moduleResolution": "node",                // ✅ Resolve module ตาม Node
+    "allowSyntheticDefaultImports": true,      // ✅ สำหรับ import Axios, etc.
     "strict": true,
-    "esModuleInterop": true,
-    "outDir": "dist",
-    "rootDir": "src"
-  }
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "dist",                          // หรือ path ที่คุณใช้ build
+    "rootDir": "src",
+    "resolveJsonModule": true                  // หาก import JSON
+  },
+  "include": ["src/**/*.ts"]
 }
