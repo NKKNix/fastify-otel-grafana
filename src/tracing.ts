@@ -1,17 +1,40 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
+// 🔽 เปลี่ยนมาใช้ HTTP Exporter
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { Resource } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+// 🔼
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+
+// 🔽 สร้าง Exporter ที่ใช้ HTTP และชี้ไปที่พอร์ต 4318
+const traceExporter = new OTLPTraceExporter({
+  url: 'http://localhost:4318/v1/traces',
+});
+const metricExporter = new OTLPMetricExporter({
+  url: 'http://localhost:4318/v1/metrics',
+});
+// 
 
 const sdk = new NodeSDK({
   resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'service-1', // หรือ service-2
+    [SemanticResourceAttributes.SERVICE_NAME]: 'my-fastify-app',
   }),
-  traceExporter: new OTLPTraceExporter({
-    url: 'http://localhost:4318/v1/traces', // ส่งไปยัง collector
+  spanProcessor: new BatchSpanProcessor(traceExporter),
+  metricReader: new PeriodicExportingMetricReader({
+    exporter: metricExporter,
+    exportIntervalMillis: 1000, // ลดเวลาลงเพื่อดีบักให้เห็นผลเร็ว
   }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
 sdk.start();
+
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('Tracing terminated'))
+    .catch((error) => console.log('Error terminating tracing', error))
+    .finally(() => process.exit(0));
+});

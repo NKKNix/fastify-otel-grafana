@@ -1,3 +1,5 @@
+version: '3.8' # แนะนำให้ใช้เวอร์ชันที่ใหม่ขึ้น
+
 services:
   otel-collector:
     image: otel/opentelemetry-collector:latest
@@ -5,7 +7,13 @@ services:
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "4318:4318" # OTLP HTTP (รับจาก Fastify app)
+      # Port สำหรับรับข้อมูลจากแอปพลิเคชันของคุณ
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+    networks:
+      - monitoring # << เพิ่มเข้ามา
+    depends_on:
+      - tempo
 
   tempo:
     image: grafana/tempo:latest
@@ -14,9 +22,11 @@ services:
       - ./tempo.yaml:/etc/tempo.yaml
       - ./data/tempo:/tmp/tempo
     ports:
-      - "3200:3200"     # Tempo UI/API
-      - "4320:4320"     # OTLP HTTP (จาก OTel Collector)
-      - "4321:4321"     # OTLP gRPC (จาก OTel Collector)
+      - "3200:3200"  # Tempo UI
+      - "4320:4320"  # OTLP HTTP
+      - "4321:4321"  # OTLP gRPC
+    networks:
+      - monitoring # << เพิ่มเข้ามา
 
   grafana:
     image: grafana/grafana:latest
@@ -24,9 +34,22 @@ services:
       - "3001:3000"
     depends_on:
       - tempo
+      - prometheus # << เพิ่มเข้ามา
+    networks:
+      - monitoring
+
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest # แนะนำให้ระบุเวอร์ชัน :latest
+    container_name: prometheus
     ports:
-      - "9090:9090"
+      - "9091:9090"  # << เปลี่ยน port เพื่อไม่ให้ชนกับ otel-collector
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+    depends_on:
+      - otel-collector
+
+networks:
+  monitoring:
+    driver: bridge

@@ -1,29 +1,28 @@
 {
-  "name": "observable-node-app",
+  "name": "my-fastify-app-ts",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/server.ts",
-    "dev": "ts-node src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/server.ts"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.8.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
-    "@opentelemetry/exporter-prometheus": "^0.27.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.50.0",
-    "@opentelemetry/sdk-metrics-base": "^0.31.0",
-    "@opentelemetry/sdk-node": "^0.50.0",
-    "axios": "^1.10.0",
-    "express": "^4.18.0",
-    "fastify": "^5.4.0",
-    "prom-client": "^14.0.0",
-    "winston": "^3.10.0"
+    "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "0.48.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.52.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.52.0",
+    "@opentelemetry/resources": "1.25.0",
+    "@opentelemetry/sdk-metrics": "1.25.0",
+    "@opentelemetry/sdk-node": "0.52.0",
+    "@opentelemetry/sdk-trace-base": "1.25.0",
+    "@opentelemetry/sdk-trace-node": "1.25.0",
+    "@opentelemetry/semantic-conventions": "1.25.0",
+    "fastify": "^4.28.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.0",
-    "@types/node": "^20.0.0",
-    "ts-node": "^10.0.0",
-    "typescript": "^5.0.0"
+    "@types/node": "^20.14.9",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.2"
   }
 }
