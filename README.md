@@ -1,4 +1,4 @@
-##how to start project
+## how to start project
 
 npm install
 
